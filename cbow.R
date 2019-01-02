@@ -56,7 +56,6 @@ grad_v <- function(U, i, e, l) {
   return((ui - e)/(2*l))
 }
 
-p<-6
 my_sgd <- function(D, vocab, p, n_iter, eta = 0.025) {
   # Initialiser aléatoirement U et V
   n <- length(vocab)
