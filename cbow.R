@@ -97,7 +97,8 @@ my_sgd <- function(D, vocab, p, n_iter, eta = 0.025) {
 }
 
 # test my_sgd
-res <- sgd_CBOW(D, dict,6,10,0.02)
+vocab<-unique(corpus[1:30000])
+res <- my_sgd(D, vocab,3,5)
 U<-res$U
 V<-res$V
 
