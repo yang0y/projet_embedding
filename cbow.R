@@ -5,6 +5,11 @@ library(NLP)
 library(tm)
 library(MASS)
 
+rm(list=ls())
+
+#setwd("/home/david/Nextcloud/6. Cours/Word Embedding/Projet/projet_embedding")
+##corpus <- readLines("../../../7. Programmation/Données/text9", n=1, warn=FALSE)
+#corpus <- readLines("../../../7. Programmation/Données/text8", n=1, warn=FALSE)
 
 # Generation du jeu de donnees d’apprentissage
 max_vocabulary_size <- 30000
@@ -20,7 +25,7 @@ stop_words <- tm::stopwords(kind = "en")
 corpus <- corpus[!(corpus %in% stop_words)]
 
 dict <- unique(corpus)
-dict1<- unique(corpus[1:30000])
+#dict1<- unique(corpus[1:30000])
 #trouver l'indice de chaque mot correspond
 require(parallel)
 cls <- makeCluster(detectCores())
@@ -40,7 +45,7 @@ softmax <- function(U, alpha) {
   # scalaires Ui * alpha (un pour chaque ligne de U)
   scal <- exp(U %*% alpha)
   total <- sum(scal)
-  
+
   res <- as.vector(scal/total)
   return(res)
 }
@@ -66,22 +71,22 @@ my_sgd <- function(D, vocab, p, n_iter, eta = 0.025) {
     # Mélanger aléatoirement D
     order <- sample(1:nrow(D), nrow(D), replace = F)
     Dp <- D[order, ]
-    
+
     # Pour chaque paire wi et contexte, mettre à jour les vecteurs selon les formule
     for(row in 1:nrow(D)){
       # ID du mot cible
       i <- Dp[row, 1]
       # ID des mots contexte
       j <- Dp[row, -1]
-      
+
       # Calcul du alpha contexte
       alpha <- apply(V[j,], 2, sum)/(2*l)
       # Calcul des Softmax
       softmax <- softmax(U, alpha)
-      
+
       # MAJ de Ui
       U[i,] <- U[i,] + eta * grad_u(softmax[i], alpha)
-      
+
       # Pour chaque mots contexte
       for(word in 1:(ncol(D)-1)){
         # ID du mot cible
@@ -92,12 +97,13 @@ my_sgd <- function(D, vocab, p, n_iter, eta = 0.025) {
       }
     }
   }
-  
+
   return(list(U=U,V=V))
 }
 
 # test my_sgd
-vocab<-unique(corpus[1:30000])
+#vocab<-unique(corpus[1:30000])
+vocab<-unique(corpus[1:max_vocabulary_size])
 res <- my_sgd(D, vocab,3,5)
 U<-res$U
 V<-res$V
@@ -113,7 +119,7 @@ find_closest_words <- function(v, n=5){
   for(i in 1:nrow(U)){
     similarity[i] <- cosine_similarity(v, U[i, ])
   }
-  ordered_words <- dict1[order(-similarity)]
+  ordered_words <- dict[order(-similarity)]
   return(ordered_words[1:n])
 }
 
@@ -122,6 +128,8 @@ resolve_analogy <- function(word_a, word_b, word_c, n=1){
   return(find_closest_words(word_d, n))
 }
 
-
 cosine_similarity(U[match('cat', dict), ], U[match('car', dict), ])
 resolve_analogy('father','mother', 'son')
+
+# Exportation pour Shiny
+save(U, dict, file="save.RData")
