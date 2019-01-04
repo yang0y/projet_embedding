@@ -40,64 +40,86 @@ for(w in 1:(max_vocabulary_size-2*l)){
   D[w,] <- c(corpus_indice[w+l], corpus_indice[w+l-(l:1)], corpus_indice[w+l+(1:l)])
 }
 
-#function softmax
+#function softmax 
+#   input:
+#         U: matrice représentations cibles wi des mots
+#         alpha: la moyenne des vecteurs mots contextes
+#   output:
+#         probabilité observer wi sachant mots contextes c
 softmax <- function(U, alpha) {
-  # scalaires Ui * alpha (un pour chaque ligne de U)
+  # scalaires Ui * alpha
   scal <- exp(U %*% alpha)
   total <- sum(scal)
-
+  
   res <- as.vector(scal/total)
   return(res)
 }
 
 #Le gradient de l en Ui
-grad_u <- function(softmax, alpha) {
-  return(alpha * (1-softmax))
+#   input: 
+#         p_wi_c:probabilité observer wi sachant mots contextes c
+#         alpha:la moyenne des vecteurs mots contextes
+#   output:
+#         mettre à jour U par gradient stochastique descent
+grad_u <- function(p_wi_c, alpha) {
+  return(alpha * (1-p_wi_c))
 }
 
 #Le gradient de l en Vj
+#   input:
+#         U: matrice représentations cibles wi des mots
+#         i: indice de mot cible
+#         e: esperance de probabilite wi sachant mots contextes c
+#         l: longeur de fenetre
+#   output:
+#          mettre à jour V par gradient stochastique descent
 grad_v <- function(U, i, e, l) {
   ui <- U[i,]
   return((ui - e)/(2*l))
 }
 
-my_sgd <- function(D, vocab, p, n_iter, eta = 0.025) {
+#Algorithme cbow avec calcul explicite du softmax
+#   input:
+#         D: le jeu de donnee en un multi-ensemble de paires (mots, contexte)
+#         vocab: tous les mot identique
+#         d: dimension vecteur de mot
+#         n_iter: nombre de iteration
+#         eta: vitesse de gradient
+#   output:
+#         U: matrice représentations cibles des mots
+#         V: matrice représentations contexte des mots,
+my_sgd <- function(D, vocab, d, n_iter, eta = 0.025) {
   # Initialiser aléatoirement U et V
   n <- length(vocab)
-  U <- matrix(runif(n*p,-0.2,0.2), nrow = n, ncol = p)
-  V <- matrix(runif(n*p,-0.2,0.2), nrow = n, ncol = p)
+  U <- matrix(runif(n*d,-0.2,0.2), nrow = n, ncol = d)
+  V <- matrix(runif(n*d,-0.2,0.2), nrow = n, ncol = d)
   # Répéter iter fois
   for(iter in 1:n_iter){
     # Mélanger aléatoirement D
     order <- sample(1:nrow(D), nrow(D), replace = F)
     Dp <- D[order, ]
-
     # Pour chaque paire wi et contexte, mettre à jour les vecteurs selon les formule
     for(row in 1:nrow(D)){
       # ID du mot cible
       i <- Dp[row, 1]
       # ID des mots contexte
       j <- Dp[row, -1]
-
       # Calcul du alpha contexte
       alpha <- apply(V[j,], 2, mean)
-      # Calcul des Softmax
-      soft <- softmax(U, alpha)
-
+      # probabilité observer wi sachant mots contextes c
+      p_wi <- softmax(U,alpha)
       # MAJ de Ui
-      U[i,] <- U[i,] + eta * grad_u(soft[i], alpha)
-
+      U[i,] <- U[i,] + eta * grad_u(p_wi[i], alpha)
       # Pour chaque mots contexte
-      for(word in 1:(ncol(D)-1)){
+      for(word in 2:ncol(D)){
         # ID du mot cible
-        jl <- Dp[row, word + 1]
+        jl <- Dp[row, word]
         # MAJ de Vjl
-        s_ui <- colSums(U * soft)
+        s_ui <- colSums(U * p_wi)
         V[jl,] <- V[jl,] + eta * grad_v(U, i, s_ui, l)
       }
     }
   }
-
   return(list(U=U,V=V))
 }
 
