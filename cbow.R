@@ -7,13 +7,13 @@ library(MASS)
 
 rm(list=ls())
 
-#setwd("/home/david/Nextcloud/6. Cours/Word Embedding/Projet/projet_embedding")
-##corpus <- readLines("../../../7. Programmation/Données/text9", n=1, warn=FALSE)
-#corpus <- readLines("../../../7. Programmation/Données/text8", n=1, warn=FALSE)
+setwd("/home/david/Nextcloud/6. Cours/Word Embedding/Projet/projet_embedding")
+#corpus <- readLines("../../../7. Programmation/Données/text9", n=1, warn=FALSE)
+corpus <- readLines("../../../../7. Programmation/Données/text8", n=1, warn=FALSE)
 
 # Generation du jeu de donnees d’apprentissage
 max_vocabulary_size <- 30000
-corpus <- readLines('text8', n=1, warn=FALSE)
+#corpus <- readLines('text8', n=1, warn=FALSE)
 # Tokenisation
 corpus <- word_tokenizer(corpus)[[1]]
 # Largeur de la fenêtre contexte
@@ -154,4 +154,7 @@ cosine_similarity(U[match('cat', dict), ], U[match('car', dict), ])
 resolve_analogy('father','mother', 'son')
 
 # Exportation pour Shiny
-save(U, dict, file="save.RData")
+vectors_cbow <- U
+words_cbow <- dict
+# Exportation pour Shiny
+save(vectors_cbow, words_cbow, file="save_cbow.RData")
