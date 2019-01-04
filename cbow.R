@@ -80,19 +80,19 @@ my_sgd <- function(D, vocab, p, n_iter, eta = 0.025) {
       j <- Dp[row, -1]
 
       # Calcul du alpha contexte
-      alpha <- apply(V[j,], 2, sum)/(2*l)
+      alpha <- apply(V[j,], 2, mean)
       # Calcul des Softmax
-      softmax <- softmax(U, alpha)
+      soft <- softmax(U, alpha)
 
       # MAJ de Ui
-      U[i,] <- U[i,] + eta * grad_u(softmax[i], alpha)
+      U[i,] <- U[i,] + eta * grad_u(soft[i], alpha)
 
       # Pour chaque mots contexte
       for(word in 1:(ncol(D)-1)){
         # ID du mot cible
         jl <- Dp[row, word + 1]
         # MAJ de Vjl
-        s_ui <- colSums(U * softmax)
+        s_ui <- colSums(U * soft)
         V[jl,] <- V[jl,] + eta * grad_v(U, i, s_ui, l)
       }
     }
