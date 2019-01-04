@@ -12,6 +12,7 @@ setwd("/home/david/Nextcloud/6. Cours/Word Embedding/Projet/projet_embedding")
 corpus <- readLines("../../../../7. Programmation/Données/text8", n=1, warn=FALSE)
 
 # Generation du jeu de donnees d’apprentissage
+#max_vocabulary_size <- 30000
 max_vocabulary_size <- 30000
 #corpus <- readLines('text8', n=1, warn=FALSE)
 # Tokenisation
@@ -49,6 +50,7 @@ for(w in 1:(max_vocabulary_size-2*l)){
 softmax <- function(U, alpha) {
   # scalaires Ui * alpha
   scal <- exp(U %*% alpha)
+  #scal <- exp(t(U) * alpha)
   total <- sum(scal)
   
   res <- as.vector(scal/total)
@@ -91,8 +93,10 @@ grad_v <- function(U, i, e, l) {
 my_sgd <- function(D, vocab, d, n_iter, eta = 0.025) {
   # Initialiser aléatoirement U et V
   n <- length(vocab)
-  U <- matrix(runif(n*d,-0.2,0.2), nrow = n, ncol = d)
-  V <- matrix(runif(n*d,-0.2,0.2), nrow = n, ncol = d)
+  #U <- matrix(runif(n*d,-0.2,0.2), nrow = n, ncol = d)
+  U <- matrix(runif(n*d), nrow = n, ncol = d)
+  #V <- matrix(runif(n*d,-0.2,0.2), nrow = n, ncol = d)
+  V <- matrix(runif(n*d), nrow = n, ncol = d)
   # Répéter iter fois
   for(iter in 1:n_iter){
     # Mélanger aléatoirement D
@@ -125,10 +129,10 @@ my_sgd <- function(D, vocab, d, n_iter, eta = 0.025) {
 
 # test my_sgd
 #vocab<-unique(corpus[1:30000])
-vocab<-unique(corpus[1:max_vocabulary_size])
-res <- my_sgd(D, vocab,3,5)
-U<-res$U
-V<-res$V
+vocab <- unique(corpus[1:max_vocabulary_size])
+res <- my_sgd(D, vocab, d = 5, n_iter = 5)
+U <- res$U
+V <- res$V
 
 cosine_similarity <- function(v1, v2){
   dot_product <- v1 %*% v2
