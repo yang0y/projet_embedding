@@ -12,33 +12,40 @@ setwd("/home/david/Nextcloud/6. Cours/Word Embedding/Projet/projet_embedding")
 corpus <- readLines("../../../../7. Programmation/Données/text8", n=1, warn=FALSE)
 
 # Generation du jeu de donnees d’apprentissage
-#max_vocabulary_size <- 30000
-max_vocabulary_size <- 30000
-#corpus <- readLines('text8', n=1, warn=FALSE)
-# Tokenisation
-corpus <- word_tokenizer(corpus)[[1]]
-# Largeur de la fenêtre contexte
-l <- 3
-# Ajout NA au début et a la fin
-corpus <- c(rep("NA", l),corpus,rep("NA", l))
-#Suppression des stopwords
-stop_words <- tm::stopwords(kind = "en")
-corpus <- corpus[!(corpus %in% stop_words)]
-
-dict <- unique(corpus)
-#dict1<- unique(corpus[1:30000])
-#trouver l'indice de chaque mot correspond
-require(parallel)
-cls <- makeCluster(detectCores())
-clusterExport(cls, c("dict"), envir = environment())
-corpus_indice <- unlist(parLapply(cls, corpus[1:max_vocabulary_size], function(x){which(x == dict)}))
-stopCluster(cls)
-#Construction jeu de donnees
-D <- matrix(0, nrow = length(corpus_indice)-2*l, ncol = 1+2*l)
-colnames(D) <- c("target", paste0("context_", 1:(2*l)))
-
-for(w in 1:(max_vocabulary_size-2*l)){
-  D[w,] <- c(corpus_indice[w+l], corpus_indice[w+l-(l:1)], corpus_indice[w+l+(1:l)])
+# input:
+#       path: chemin de data
+#       l:nombre de contexte
+#       size_text: longueur de text
+# output:
+#       D:jeu de donnees
+#       vocab:dictionnaire
+generation_data<-function(path,l,size_text){
+  # Tokenisation
+  corpus <- word_tokenizer(readLines("text8", warn=FALSE))[[1]]
+  
+  # Ajout NA au début et a la fin
+  corpus <- c(rep("NA", l),corpus,rep("NA", l))
+  
+  #Suppression des stopwords
+  stop_words <- tm::stopwords(kind = "en")
+  corpus <- corpus[!(corpus %in% stop_words)]
+  
+  #Creation dictionaire
+  vocab <- unique(corpus[1:size_text])
+  require(parallel)
+  cls <- makeCluster(detectCores())
+  clusterExport(cls, c("vocab"), envir = environment())
+  corpus_indice <- unlist(parLapply(cls, corpus[1:size_text], function(x){which(x == vocab)}))
+  stopCluster(cls)
+  
+  #Construction jeu de donnees
+  D <- matrix(0, nrow = length(corpus_indice)-2*l, ncol = 1+2*l)
+  colnames(D) <- c("target", paste0("context_", 1:(2*l)))
+  
+  for(w in 1:(size_text-2*l)){
+    D[w,] <- c(corpus_indice[w+l], corpus_indice[w+l-(l:1)], corpus_indice[w+l+(1:l)])
+  }
+  return(list(D=D,vocab=vocab))
 }
 
 #function softmax 
@@ -127,10 +134,9 @@ my_sgd <- function(D, vocab, d, n_iter, eta = 0.025) {
   return(list(U=U,V=V))
 }
 
-# test my_sgd
-#vocab<-unique(corpus[1:30000])
-vocab <- unique(corpus[1:max_vocabulary_size])
-res <- my_sgd(D, vocab, d = 5, n_iter = 5)
+# on choisit l=5 comme skip-gram en seance 3 et 100000 
+data<-generation_data("text8",5,size_text = 100000)
+res <- my_sgd(data$D, data$vocab, d = 100, n_iter = 3)
 U <- res$U
 V <- res$V
 
@@ -159,6 +165,6 @@ resolve_analogy('father','mother', 'son')
 
 # Exportation pour Shiny
 vectors_cbow <- U
-words_cbow <- dict
+words_cbow <- data$vocab
 # Exportation pour Shiny
 save(vectors_cbow, words_cbow, file="save_cbow.RData")
