@@ -6,12 +6,13 @@ library(MASS)
 
 rm(list=ls())
 
-setwd("/home/david/Nextcloud/6. Cours/Word Embedding/Projet/projet_embedding")
+#setwd("/home/david/Nextcloud/6. Cours/Word Embedding/Projet/projet_embedding")
 
 tic("Chargement et préparation du corpus")
 max_vocabulary_size <- 30000
-corpus <- readLines("../../../../7. Programmation/Données/text8", n=1, warn=FALSE)
+#corpus <- readLines("../../../../7. Programmation/Données/text8", n=1, warn=FALSE)
 #corpus <- readLines('../Data/text9', n=1, warn=FALSE)
+corpus <- readLines('text9', n=1, warn=FALSE)
 iterator <- itoken(corpus, tokenizer=space_tokenizer, progressbar=FALSE)
 vocabulary <- create_vocabulary(iterator)
 print(sum(vocabulary$term_count))
@@ -77,8 +78,6 @@ find_closest_words(vectors[match('car', words), ])
 
 resolve_analogy('father','mother', 'son')
 resolve_analogy('france','paris', 'spain')
-
-save(vectors, words, file="save_skipgram.RData")
 
 vectors_skipgram <- vectors
 words_skipgram <- words
