@@ -2,7 +2,8 @@
 
 ## CBOW
 
-cbow.R
+cbow.R tous les funciton utile pour cbow
+main.R execute cbow
 
 ## Application Shiny
 
