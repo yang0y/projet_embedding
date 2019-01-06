@@ -1,5 +1,5 @@
 function(input, output) {
-  load("save_cbow.RData")
+  load("save_cbow100.RData")
   load("save_skipgram.RData")
   
   # Fonctions
