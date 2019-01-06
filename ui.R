@@ -12,10 +12,10 @@ fluidPage(
                                h2("CBOW"))),
                       fluidRow(
                         column(3,
-                               textInput("similarity1", label = "")
+                               textInput("similarity1", label = "" ,value ="mother")
                                ),
                         column(3,
-                               textInput("similarity2", label = "")
+                               textInput("similarity2", label = "",value ="father")
                                ),
                         column(3,
                                verbatimTextOutput("value_similarity_skipgram", placeholder=TRUE)
@@ -36,13 +36,13 @@ fluidPage(
                                h2("CBOW"))),
                       fluidRow(
                         column(2,
-                               textInput("analogy1", label = "")
+                               textInput("analogy1", label = "",value ="mother")
                                ),
                         column(2,
-                               textInput("analogy2", label = "")
+                               textInput("analogy2", label = "",value ="father")
                                ),
                         column(2,
-                               textInput("analogy3", label = "")
+                               textInput("analogy3", label = "",value ="son")
                                ),
                         column(3,
                                verbatimTextOutput("value_analogy_skipgram", placeholder=TRUE)
@@ -97,5 +97,33 @@ fluidPage(
                       fluidRow(
                         submitButton("Envoyer"))
 
+                      ),
+             tabPanel("Projections",
+                      fluidRow(
+                        column(12,
+                               h2("les projections en 2 dimensions")
+                        )),
+                      fluidRow(
+                        column(10,
+                              textInput("visu_mots", label = "", value = "big large cat dog mother father animal")
+                        ),
+                        column(2,
+                               submitButton("Envoyer")
+                        )
+                      ),
+                      fluidRow(
+                        column(6,
+                               h2("Skip-gram")),
+                        column(6,
+                               h2("CBOW"))),
+                      fluidRow(
+                        column(6,
+                               plotOutput("projection_skipgram")
+                        ),
+                        column(6,
+                               plotOutput("projection_cbow")
+                        )
                       ))
-)
+                      
+             )
+  )
