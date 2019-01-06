@@ -42,7 +42,7 @@ generation_data<-function(path,l,size_text){
   return(list(D=D,vocab=vocab))
 }
 
-#function softmax 
+#Calcul la vraisemblance du jeu de données avec function softmax
 #   input:
 #         U: matrice représentations cibles wi des mots
 #         alpha: la moyenne des vecteurs mots contextes
@@ -121,7 +121,7 @@ my_sgd <- function(D, vocab, d, n_iter, eta = 0.025) {
         jl <- Dp[row, word]
         # MAJ de Vjl
         s_ui <- colSums(U * p_wi)
-        V[jl,] <- V[jl,] + eta * grad_v(U, i, s_ui, l)
+        V[jl,] <- V[jl,] + eta * grad_v(U, i, s_ui, (ncol(D)-1)/2)
       }
     }
   }
