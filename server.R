@@ -81,8 +81,8 @@ function(input, output) {
     words <- strsplit(tolower(input$sentence), " ")[[1]]
     require(tm)
     stop_words <- tm::stopwords(kind = "en")
-    words1 <- words[!(words %in% stop_words)]
-    likelyhood_sentence_cbow(words1)
+    words <- words[!(words %in% stop_words)]
+    likelyhood_sentence_cbow(words)
   })
   
   sentence_skipgram<- reactive({
