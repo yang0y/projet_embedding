@@ -28,6 +28,29 @@ function(input, output) {
     return(find_closest_words(vectors_cbow, words_cbow, word_d, n))
   }
   
+  #la vraisemblance d’une phrase
+  likelyhood_sentence_cbow <- function(sent){
+    # cosinus similaritie de chaque deux mot
+    similaire <- c()
+    for(i in 1:(length(sent)-1)){
+      for(j in (i+1):length(sent)){
+        similaire <- c(similaire, cosine_similarity(vectors_cbow[match(sent[i], words_cbow), ], vectors_cbow[match(sent[j], words_cbow), ]))
+      }
+    }
+    return(mean(similaire))
+  }
+  
+  likelyhood_sentence_skipgram <- function(sent){
+    # cosinus similaritie de chaque deux mot
+    similaire <- c()
+    for(i in 1:(length(sent)-1)){
+      for(j in (i+1):length(sent)){
+        similaire <- c(similaire, cosine_similarity(vectors_skipgram[match(sent[i], words_skipgram), ], vectors_skipgram[match(sent[j], words_skipgram), ]))
+      }
+    }
+    return(mean(similaire))
+  }
+  
   # Similarités
   similarity_skipgram <- reactive({
     cosine_similarity(vectors_skipgram[match(input$similarity1, words_skipgram), ], vectors_skipgram[match(input$similarity2, words_skipgram), ])
@@ -53,6 +76,20 @@ function(input, output) {
     find_closest_words(vectors_cbow, words_cbow, vectors_cbow[match(input$closest_words1, words_cbow), ], 10)
   })
   
+  #la vraisemblance d’une phrase
+  sentence_cbow <- reactive({
+    words <- strsplit(tolower(input$sentence), " ")[[1]]
+    require(tm)
+    stop_words <- tm::stopwords(kind = "en")
+    words1 <- words[!(words %in% stop_words)]
+    likelyhood_sentence_cbow(words1)
+  })
+  
+  sentence_skipgram<- reactive({
+    words <- strsplit(tolower(input$sentence), " ")[[1]]
+    likelyhood_sentence_skipgram(words)
+  })
+  
   # Envoi des valeurs
   output$value_similarity_skipgram <- similarity_skipgram
   output$value_similarity_cbow <- similarity_cbow
@@ -60,5 +97,6 @@ function(input, output) {
   output$value_analogy_cbow <- analogy_cbow
   output$value_closest_words_skipgram <- closest_words_skipgram
   output$value_closest_words_cbow <- closest_words_cbow
-
+  output$value_vraisemblance_skipgram <- sentence_skipgram
+  output$value_vraisemblance_cbow <- sentence_cbow
 }

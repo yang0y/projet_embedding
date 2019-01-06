@@ -75,5 +75,27 @@ fluidPage(
                       fluidRow(
                         submitButton("Envoyer"))
                       ),
-             tabPanel("Autres"))
+             tabPanel("Vraisemblance",
+                      fluidRow(
+                        column(6,
+                               h2("Calcul Vraisemblance d'une phrase")),
+                        column(3,
+                               h2("Skip-gram")),
+                        column(3,
+                               h2("CBOW"))),
+                      fluidRow(
+                        column(6,
+                               textInput("sentence", label = "", value = "i like stay at home we are family")
+                        ),
+                        column(3,
+                               verbatimTextOutput("value_vraisemblance_skipgram", placeholder=TRUE)
+                        ),
+                        column(3,
+                               verbatimTextOutput("value_vraisemblance_cbow", placeholder=TRUE)
+                        )
+                      ),
+                      fluidRow(
+                        submitButton("Envoyer"))
+
+                      ))
 )
