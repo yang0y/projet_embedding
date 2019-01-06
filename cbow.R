@@ -5,12 +5,6 @@ library(NLP)
 library(tm)
 library(MASS)
 
-rm(list=ls())
-
-setwd("/home/david/Nextcloud/6. Cours/Word Embedding/Projet/projet_embedding")
-#corpus <- readLines("../../../7. Programmation/Données/text9", n=1, warn=FALSE)
-corpus <- readLines("../../../../7. Programmation/Données/text8", n=1, warn=FALSE)
-
 # Generation du jeu de donnees d’apprentissage
 # input:
 #       path: chemin de data
