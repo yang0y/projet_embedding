@@ -14,6 +14,8 @@
 
     Implémentation de skipgram vue au TD3
 
+Les jeux de données (text8 et text9) doivent être présents dans le même répertoire que les scripts.
+
 ## Application Shiny
 
 * ui.R
