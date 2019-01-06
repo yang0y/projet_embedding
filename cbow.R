@@ -127,38 +127,3 @@ my_sgd <- function(D, vocab, d, n_iter, eta = 0.025) {
   }
   return(list(U=U,V=V))
 }
-
-# on choisit l=5 comme skip-gram en seance 3 et 100000 
-data<-generation_data("text8",5,size_text = 100000)
-res <- my_sgd(data$D, data$vocab, d = 100, n_iter = 3)
-U <- res$U
-V <- res$V
-
-cosine_similarity <- function(v1, v2){
-  dot_product <- v1 %*% v2
-  norm_prod <- sqrt(sum(v1**2)) * sqrt(sum(v2**2))
-  return(as.numeric(dot_product / norm_prod))
-}
-
-find_closest_words <- function(v, n=5){
-  similarity <- numeric(nrow(U))
-  for(i in 1:nrow(U)){
-    similarity[i] <- cosine_similarity(v, U[i, ])
-  }
-  ordered_words <- dict[order(-similarity)]
-  return(ordered_words[1:n])
-}
-
-resolve_analogy <- function(word_a, word_b, word_c, n=1){
-  word_d <- U[match(word_b, dict), ] - U[match(word_a, dict), ] + U[match(word_c, dict), ]
-  return(find_closest_words(word_d, n))
-}
-
-cosine_similarity(U[match('cat', dict), ], U[match('car', dict), ])
-resolve_analogy('father','mother', 'son')
-
-# Exportation pour Shiny
-vectors_cbow <- U
-words_cbow <- data$vocab
-# Exportation pour Shiny
-save(vectors_cbow, words_cbow, file="save_cbow.RData")
