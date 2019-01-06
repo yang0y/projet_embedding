@@ -34,7 +34,7 @@ generation_data<-function(path,l,size_text){
   
   #Construction jeu de donnees
   D <- matrix(0, nrow = length(corpus_indice)-2*l, ncol = 1+2*l)
-  colnames(D) <- c("target", paste0("context_", 1:(2*l)))
+  colnames(D) <- c("cible", paste0("context_", 1:(2*l)))
   
   for(w in 1:(size_text-2*l)){
     D[w,] <- c(corpus_indice[w+l], corpus_indice[w+l-(l:1)], corpus_indice[w+l+(1:l)])
